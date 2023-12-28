@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "388180276619",
+    "project_id": "lovegame-6890a",
+    "storage_bucket": "lovegame-6890a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:388180276619:android:882cc26904ddd65026eb8e",
+        "android_client_info": {
+          "package_name": "com.lovegame"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "388180276619-d4nlceubn1ijdtqfhde54uf1ui82t090.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lovegame",
+            "certificate_hash": "45bfbf51c75e951d96419abc8de8d2c338a47dd1"
+          }
+        },
+        {
+          "client_id": "388180276619-bahsjj9blmj4dcmnd6nv1nqo0gilihlg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRJWNOrqbuV4WAYJJ3xFtkZbTsk0k7JRw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "388180276619-bahsjj9blmj4dcmnd6nv1nqo0gilihlg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
