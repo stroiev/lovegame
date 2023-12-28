@@ -1,3 +1,10 @@
+name: AndroidBuild
+on:
+  pull_request:
+    barnches: [main]
+  push:
+    branches: [main]
+
 jobs:
   build:
     runs-on: ubuntu-latest
