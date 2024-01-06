@@ -32,41 +32,13 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     private val TAG = "MainActivity"
     private val viewModel: MainViewModel by viewModels()
-//    private lateinit var auth: FirebaseAuth
-//    private lateinit var googleSignInClient: GoogleSignInClient
-
-//    private val getResult =
-//        registerForActivityResult(
-//            ActivityResultContracts.StartActivityForResult()) {
-//            if(it.resultCode == Activity.RESULT_OK){
-//                val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
-//                try {
-//                    // Google Sign In was successful, authenticate with Firebase
-//                    val account = task.getResult(ApiException::class.java)!!
-//                    Log.d(TAG, "firebaseAuthWithGoogle:" + account.id)
-//                    firebaseAuthWithGoogle(account.idToken!!)
-//                } catch (e: ApiException) {
-//                    // Google Sign In failed, update UI appropriately
-//                    Log.w(TAG, "Google sign in failed", e)
-//                }
-//            }
-//        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//            .requestIdToken(getString(R.string.default_web_client_id))
-//            .requestEmail()
-//            .build()
-//        googleSignInClient = GoogleSignIn.getClient(this, gso)
-//        auth = Firebase.auth
-
         installSplashScreen().setKeepOnScreenCondition {
             viewModel.isLoading.value
         }
-
-//        setMainContent(displayWidth, displayHeight, "")
 
         setContent {
             LoveGameTheme {
@@ -173,44 +145,4 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-//    private fun setMainContent(displayWidth: Int, displayHeight: Int, greeting: String) {
-//        setContent {
-//            LoveGameTheme(dynamicColor = false) {
-//                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    ComposeScaffold(displayWidth, displayHeight, greeting){
-//                        val signInIntent = googleSignInClient.signInIntent
-//                        getResult.launch(signInIntent)
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    private fun firebaseAuthWithGoogle(idToken: String) {
-//        val credential = GoogleAuthProvider.getCredential(idToken, null)
-//        auth.signInWithCredential(credential)
-//            .addOnCompleteListener(this) { task ->
-//                if (task.isSuccessful) {
-//                    // Sign in success, update UI with the signed-in user's information
-//                    Log.d(TAG, "signInWithCredential:success")
-//                    val user = auth.currentUser
-//                    if (user != null) {
-//                        user.displayName?.let { setMainContent(displayWidth, displayHeight, it) }
-//                    }
-//                } else {
-//                    // If sign in fails, display a message to the user.
-//                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-//                }
-//            }
-//    }
-
-//    companion object {
-//        private const val TAG = "GoogleActivity"
-//        private const val RC_SIGN_IN = 9001
-//    }
 }
