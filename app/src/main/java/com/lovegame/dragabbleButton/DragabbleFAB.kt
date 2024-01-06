@@ -1,5 +1,6 @@
-package com.lovegame.compose
+package com.lovegame.dragabbleButton
 
+import android.content.res.Resources
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -11,7 +12,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,9 +30,9 @@ import kotlin.math.roundToInt
 fun DragabbleFAB(
     snackbarHostState: SnackbarHostState,
     coroutineScope: CoroutineScope,
-    displayWidth: Int,
-    displayHeight: Int
 ) {
+    val displayWidth = Resources.getSystem().displayMetrics.widthPixels
+    val displayHeight = Resources.getSystem().displayMetrics.heightPixels
     var offsetX by remember { mutableStateOf(200f) }
     var offsetY by remember { mutableStateOf(200f) }
 
