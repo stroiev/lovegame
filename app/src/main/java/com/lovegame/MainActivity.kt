@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val TAG = "MainActivity"
+    private val TAG = "MainActivityLog"
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +51,7 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = "sign_in") {
                         composable("sign_in") {
                             val resourceUserData by viewModel.resourceUserData.collectAsStateWithLifecycle()
+                            val resourceIntentSender by viewModel.resourceIntentSender.collectAsStateWithLifecycle()
 
                             LaunchedEffect(key1 = Unit) {
                                 viewModel.getUser()
@@ -92,35 +93,36 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
 
+                            LaunchedEffect(key1 = resourceIntentSender is Resource.Success) {
+                                when (resourceIntentSender) {
+                                    is Resource.Success -> {
+                                        Log.d(TAG, "resultIntentSender Success")
+                                        Toast.makeText(applicationContext, "resultIntentSender Success", Toast.LENGTH_SHORT).show()
+                                        resourceIntentSender.data?.let {intentSender ->
+                                            launcher.launch(
+                                                IntentSenderRequest.Builder(intentSender).build()
+                                            )
+                                            viewModel.resetIntentSenderResource()
+                                        } ?: {
+                                            viewModel.signIn()
+                                        }
+                                    }
+                                    is Resource.Error -> {
+                                        Log.d(TAG, "resultIntentSender Error")
+                                        Toast.makeText(applicationContext, "resultIntentSender Error", Toast.LENGTH_SHORT).show()
+                                    }
+                                    is Resource.Loading -> {
+                                        Log.d(TAG, "resultIntentSender Loading")
+                                        Toast.makeText(applicationContext, "resultIntentSender Loading", Toast.LENGTH_SHORT).show()
+                                    }
+                                    else -> {}
+                                }
+                            }
+
                             SignInScreen(
                                 onSignInClick = {
                                     lifecycleScope.launch {
                                         viewModel.signIn()
-                                        viewModel.resourceIntentSender.collect { resource ->
-                                            when (resource) {
-                                                is Resource.Success -> {
-                                                    Log.d(TAG, "resultIntentSender Success")
-                                                    Toast.makeText(applicationContext, "resultIntentSender Success", Toast.LENGTH_SHORT).show()
-                                                    resource.data?.let {intentSender ->
-                                                        launcher.launch(
-                                                            IntentSenderRequest.Builder(intentSender).build()
-                                                        )
-                                                    } ?: {
-                                                        viewModel.signIn()
-                                                    }
-                                                }
-                                                is Resource.Error -> {
-                                                    Log.d(TAG, "resultIntentSender Error")
-                                                    Toast.makeText(applicationContext, "resultIntentSender Error", Toast.LENGTH_SHORT).show()
-                                                }
-                                                is Resource.Loading -> {
-                                                    Log.d(TAG, "resultIntentSender Loading")
-                                                    Toast.makeText(applicationContext, "resultIntentSender Loading", Toast.LENGTH_SHORT).show()
-                                                }
-
-                                                else -> {}
-                                            }
-                                        }
                                     }
                                 }
                             )
