@@ -79,6 +79,7 @@ dependencies {
 
     //Hilt
     implementation("com.google.dagger:hilt-android:2.50")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
     ksp("com.google.dagger:hilt-compiler:2.50")
 
     testImplementation("junit:junit:4.13.2")

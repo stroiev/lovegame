@@ -40,24 +40,28 @@ class MainViewModel  @Inject constructor(
             _isLoading.value = false
         }
     }
-
+    fun getUser() {
+        viewModelScope.launch {
+            _resourceUserData.value = Resource.Loading()
+            getUserUseCase.execute().collect{
+                storeSessionData(it.data)
+                _resourceUserData.value = it
+            }
+        }
+    }
     fun signIn() = viewModelScope.launch {
         _resourceIntentSender.value = Resource.Loading()
-        _resourceIntentSender.value = signInUseCase.execute()
+        signInUseCase.execute().collect{
+            _resourceIntentSender.value = it
+        }
     }
 
     fun signInWithIntent(intent: Intent) = viewModelScope.launch {
         _resourceUserData.value = Resource.Loading()
-        val resource = signInWithIntentUseCase.execute(intent)
-        storeSessionData(resource.data)
-        _resourceUserData.value = resource
-    }
-
-    fun getUser() = viewModelScope.launch {
-        _resourceUserData.value = Resource.Loading()
-        val resource = getUserUseCase.execute()
-        storeSessionData(resource.data)
-        _resourceUserData.value = resource
+        signInWithIntentUseCase.execute(intent).collect{
+            storeSessionData(it.data)
+            _resourceUserData.value = it
+        }
     }
 
     fun storeSessionData(userData: UserData?) {
@@ -71,9 +75,7 @@ class MainViewModel  @Inject constructor(
         _resourceUserData.value = Resource.Empty()
     }
 
-//    fun getUser() = liveData {
-//        getUserUseCase.execute().collect{
-//            emit(it)
-//        }
-//    }
+    fun resetIntentSenderResource() {
+        _resourceIntentSender.value = Resource.Empty()
+    }
 }
