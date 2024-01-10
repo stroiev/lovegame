@@ -46,7 +46,7 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun signOut() {
+    override fun signOut() {
         try {
             oneTapClient.signOut()
             auth.signOut()
