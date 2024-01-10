@@ -1,4 +1,4 @@
-package com.lovegame
+package com.lovegame.viewmodels
 
 import android.content.Intent
 import android.content.IntentSender
@@ -68,7 +68,7 @@ class MainViewModel  @Inject constructor(
         Session.USERDATA = userData
     }
 
-    suspend fun signOut() = signOutUseCase.execute()
+    fun signOut() = signOutUseCase.execute()
 
 
     fun resetUserDataResource() {

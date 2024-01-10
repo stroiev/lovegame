@@ -1,4 +1,4 @@
-package com.lovegame.presentation.sign_in
+package com.lovegame.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

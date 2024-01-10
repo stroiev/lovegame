@@ -8,5 +8,5 @@ interface UserRepository {
     suspend fun getUser(): UserData?
     suspend fun signIn(): IntentSender?
     suspend fun signInWithIntent(intent: Intent): UserData?
-    suspend fun signOut()
+    fun signOut()
 }
