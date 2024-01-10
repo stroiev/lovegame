@@ -4,21 +4,20 @@ import android.content.Intent
 import android.content.IntentSender
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import com.lovegame.BuildConfig
 import com.lovegame.data.mapper.UserMapper
 import com.lovegame.domain.model.UserData
 import com.lovegame.domain.repositories.UserRepository
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
-import com.lovegame.BuildConfig
 
 class UserRepositoryImpl(
     private val oneTapClient: SignInClient,
-    private val userMapper: UserMapper
+    private val userMapper: UserMapper,
+    private val auth: FirebaseAuth,
 ) : UserRepository {
-    private val auth = Firebase.auth
 
     override suspend fun getUser(): UserData? = userMapper.responseToUserData(auth.currentUser)
 

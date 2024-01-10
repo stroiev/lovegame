@@ -3,6 +3,7 @@ package com.lovegame.data.di
 import android.content.Context
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.firebase.auth.FirebaseAuth
 import com.lovegame.data.mapper.UserMapper
 import com.lovegame.data.repositories.UserRepositoryImpl
 import com.lovegame.domain.repositories.UserRepository
@@ -20,11 +21,13 @@ object UserRepositoryModule {
     @Provides
     fun provideNewsRepository(
         oneTapClient: SignInClient,
-        userMapper: UserMapper
+        userMapper: UserMapper,
+        auth: FirebaseAuth,
     ): UserRepository {
         return UserRepositoryImpl(
             oneTapClient,
-            userMapper
+            userMapper,
+            auth,
         )
     }
     @Singleton
