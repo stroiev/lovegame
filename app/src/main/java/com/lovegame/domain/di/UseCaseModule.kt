@@ -2,7 +2,7 @@ package com.lovegame.domain.di
 
 import com.lovegame.domain.repositories.UserRepository
 import com.lovegame.domain.usecase.GetUserUseCase
-import com.lovegame.domain.usecase.SignInUseCase
+import com.lovegame.domain.usecase.SignInGoogleUseCase
 import com.lovegame.domain.usecase.SignInWithIntentUseCase
 import com.lovegame.domain.usecase.SignOutUseCase
 import dagger.Module
@@ -21,8 +21,8 @@ object UseCaseModule {
     }
     @Singleton
     @Provides
-    fun provideSignInUseCase(userRepository: UserRepository): SignInUseCase {
-        return SignInUseCase(userRepository)
+    fun provideSignInGoogleUseCase(userRepository: UserRepository): SignInGoogleUseCase {
+        return SignInGoogleUseCase(userRepository)
     }
     @Singleton
     @Provides

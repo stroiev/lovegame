@@ -21,7 +21,7 @@ class UserRepositoryImpl(
 
     override suspend fun getUser(): UserData? = userMapper.responseToUserData(auth.currentUser)
 
-    override suspend fun signIn(): IntentSender? {
+    override suspend fun signInGoogle(): IntentSender? {
         val result = try {
             oneTapClient.beginSignIn(
                 buildSignInRequest()

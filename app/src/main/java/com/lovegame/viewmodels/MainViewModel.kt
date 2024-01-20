@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.lovegame.data.Session
 import com.lovegame.domain.model.UserData
 import com.lovegame.domain.usecase.GetUserUseCase
-import com.lovegame.domain.usecase.SignInUseCase
+import com.lovegame.domain.usecase.SignInGoogleUseCase
 import com.lovegame.domain.usecase.SignInWithIntentUseCase
 import com.lovegame.domain.usecase.SignOutUseCase
 import com.lovegame.domain.util.Resource
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel  @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
-    private val signInUseCase: SignInUseCase,
+    private val signInGoogleUseCase: SignInGoogleUseCase,
     private val signInWithIntentUseCase: SignInWithIntentUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
@@ -40,18 +40,17 @@ class MainViewModel  @Inject constructor(
             _isLoading.value = false
         }
     }
-    fun getUser() {
-        viewModelScope.launch {
-            _resourceUserData.value = Resource.Loading()
-            getUserUseCase.execute().collect{
-                storeSessionData(it.data)
-                _resourceUserData.value = it
-            }
+
+    fun getUser() = viewModelScope.launch {
+        _resourceUserData.value = Resource.Loading()
+        getUserUseCase.execute().collect {
+            storeSessionData(it.data)
+            _resourceUserData.value = it
         }
     }
-    fun signIn() = viewModelScope.launch {
+    fun signInGoogle() = viewModelScope.launch {
         _resourceIntentSender.value = Resource.Loading()
-        signInUseCase.execute().collect{
+        signInGoogleUseCase.execute().collect{
             _resourceIntentSender.value = it
         }
     }
