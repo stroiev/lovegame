@@ -6,9 +6,9 @@ import com.lovegame.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class SignInUseCase(private val userRepository: UserRepository) {
+class SignInGoogleUseCase(private val userRepository: UserRepository) {
     suspend fun execute(): Flow<Resource<IntentSender>> = flow {
-        emit(responseToResource(userRepository.signIn()))
+        emit(responseToResource(userRepository.signInGoogle()))
     }
 
     private fun responseToResource(response:IntentSender?):Resource<IntentSender>{

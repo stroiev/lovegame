@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="login_background_from">#FFFFFFFF</color>
+    <color name="login_background_to">#FFFF7474</color>
+    <color name="login_button">#FF904B40</color>
 </resources>

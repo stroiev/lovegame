@@ -10,9 +10,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.lovegame.compose.login.LoginScreen
+import com.lovegame.compose.profile.ProfileScreen
+import com.lovegame.compose.terms.Terms
 import com.lovegame.domain.util.Resource
 import com.lovegame.viewmodels.MainViewModel
 
@@ -30,11 +35,15 @@ fun LoveGameApp(
             LaunchedEffect(key1 = Unit) {
                 viewModel.getUser()
             }
-            LaunchedEffect(key1 = resourceUserData is Resource.Success) {
+            LaunchedEffect(key1 = resourceUserData) {
                 when (resourceUserData) {
                     is Resource.Success -> {
                         Log.d(TAG, "resultGetUser Success")
-                        navController.navigate("profile")
+                        navController.navigate("profile"){
+                            popUpTo(navController.graph.id){
+                                inclusive = true
+                            }
+                        }
                         viewModel.resetUserDataResource()
                     }
 
@@ -68,7 +77,7 @@ fun LoveGameApp(
                             )
                             viewModel.resetIntentSenderResource()
                         } ?: {
-                            viewModel.signIn()
+                            viewModel.signInGoogle()
                         }
                     }
                     is Resource.Error -> {
@@ -82,19 +91,39 @@ fun LoveGameApp(
                     }
                 }
             }
-            SignInScreen(
-                onSignInClick = {
-                    viewModel.signIn()
-                }
+            LoginScreen(
+                onSignInWithGoogleClick = {
+                    viewModel.signInGoogle()
+                },
+                onCreateAccountClick = {},
+                onTermsClick = {
+                    navController.navigate("legal/terms")
+                },
+                onPrivacyClick = {
+                    navController.navigate("legal/privacy")
+                },
+                resourceUserData is Resource.Loading
             )
         }
         composable("profile") {
             ProfileScreen(
                 onSignOut = {
                         viewModel.signOut()
-                        navController.popBackStack()
+                        navController.navigate("sign_in"){
+                            popUpTo(navController.graph.id){
+                                inclusive = true
+                            }
+                        }
                 }
             )
+        }
+        composable("legal/{legal_info}",
+            arguments = listOf(
+                navArgument("legal_info"){
+                    type = NavType.StringType
+                }
+            )) {
+            Terms(it.arguments?.getString("legal_info").toString())
         }
     }
 }

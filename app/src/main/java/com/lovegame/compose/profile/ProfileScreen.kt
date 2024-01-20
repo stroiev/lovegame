@@ -1,4 +1,4 @@
-package com.lovegame.compose
+package com.lovegame.compose.profile
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

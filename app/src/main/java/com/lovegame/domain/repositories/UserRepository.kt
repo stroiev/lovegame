@@ -6,7 +6,7 @@ import com.lovegame.domain.model.UserData
 
 interface UserRepository {
     suspend fun getUser(): UserData?
-    suspend fun signIn(): IntentSender?
+    suspend fun signInGoogle(): IntentSender?
     suspend fun signInWithIntent(intent: Intent): UserData?
     fun signOut()
 }
