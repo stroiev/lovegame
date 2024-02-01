@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lovegame.data.Session
 import com.lovegame.domain.model.UserData
+import com.lovegame.domain.usecase.CreateUserWithCredentialsUseCase
 import com.lovegame.domain.usecase.GetUserUseCase
 import com.lovegame.domain.usecase.SignInGoogleUseCase
+import com.lovegame.domain.usecase.SignInWithCredentialsUseCase
 import com.lovegame.domain.usecase.SignInWithIntentUseCase
 import com.lovegame.domain.usecase.SignOutUseCase
 import com.lovegame.domain.util.Resource
@@ -23,6 +25,8 @@ class MainViewModel  @Inject constructor(
     private val getUserUseCase: GetUserUseCase,
     private val signInGoogleUseCase: SignInGoogleUseCase,
     private val signInWithIntentUseCase: SignInWithIntentUseCase,
+    private val createUserWithCredentialsUseCase: CreateUserWithCredentialsUseCase,
+    private val signInWithCredentialsUseCase: SignInWithCredentialsUseCase,
     private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
     private val _isLoading = MutableStateFlow(true)
@@ -58,6 +62,22 @@ class MainViewModel  @Inject constructor(
     fun signInWithIntent(intent: Intent) = viewModelScope.launch {
         _resourceUserData.value = Resource.Loading()
         signInWithIntentUseCase.execute(intent).collect{
+            storeSessionData(it.data)
+            _resourceUserData.value = it
+        }
+    }
+
+    fun createUserWithCredentials(email: String, password: String) = viewModelScope.launch {
+        _resourceUserData.value = Resource.Loading()
+        createUserWithCredentialsUseCase.execute(email, password).collect{
+            storeSessionData(it.data)
+            _resourceUserData.value = it
+        }
+    }
+
+    fun signInWithCredentials(email: String, password: String) = viewModelScope.launch {
+        _resourceUserData.value = Resource.Loading()
+        signInWithCredentialsUseCase.execute(email, password).collect{
             storeSessionData(it.data)
             _resourceUserData.value = it
         }

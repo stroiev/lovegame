@@ -15,30 +15,33 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.lovegame.compose.createaccount.CreateAccount
 import com.lovegame.compose.login.LoginScreen
 import com.lovegame.compose.profile.ProfileScreen
 import com.lovegame.compose.terms.Terms
 import com.lovegame.domain.util.Resource
+import com.lovegame.util.Constants.LOG_TAG
 import com.lovegame.viewmodels.MainViewModel
 
 @Composable
 fun LoveGameApp(
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val TAG = "LoveGameTag"
     val navController = rememberNavController()
+    val resourceUserData by viewModel.resourceUserData.collectAsStateWithLifecycle()
+    val resourceIntentSender by viewModel.resourceIntentSender.collectAsStateWithLifecycle()
+
     NavHost(navController = navController, startDestination = "sign_in") {
         composable("sign_in") {
-            val resourceUserData by viewModel.resourceUserData.collectAsStateWithLifecycle()
-            val resourceIntentSender by viewModel.resourceIntentSender.collectAsStateWithLifecycle()
 
             LaunchedEffect(key1 = Unit) {
                 viewModel.getUser()
             }
+
             LaunchedEffect(key1 = resourceUserData) {
                 when (resourceUserData) {
                     is Resource.Success -> {
-                        Log.d(TAG, "resultGetUser Success")
+                        Log.d(LOG_TAG, "resultGetUser Success")
                         navController.navigate("profile"){
                             popUpTo(navController.graph.id){
                                 inclusive = true
@@ -48,17 +51,18 @@ fun LoveGameApp(
                     }
 
                     is Resource.Error -> {
-                        Log.d(TAG, "resultGetUser Error")
+                        Log.d(LOG_TAG, "resultGetUser Error")
                     }
 
                     is Resource.Loading -> {
-                        Log.d(TAG, "resultGetUser Loading")
+                        Log.d(LOG_TAG, "resultGetUser Loading")
                     }
                     is Resource.Empty -> {
-                        Log.d(TAG, "resultGetUser Empty")
+                        Log.d(LOG_TAG, "resultGetUser Empty")
                     }
                 }
             }
+
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartIntentSenderForResult(),
                 onResult = { result ->
@@ -67,10 +71,11 @@ fun LoveGameApp(
                     }
                 }
             )
+
             LaunchedEffect(key1 = resourceIntentSender is Resource.Success) {
                 when (resourceIntentSender) {
                     is Resource.Success -> {
-                        Log.d(TAG, "resultIntentSender Success")
+                        Log.d(LOG_TAG, "resultIntentSender Success")
                         resourceIntentSender.data?.let {intentSender ->
                             launcher.launch(
                                 IntentSenderRequest.Builder(intentSender).build()
@@ -81,21 +86,27 @@ fun LoveGameApp(
                         }
                     }
                     is Resource.Error -> {
-                        Log.d(TAG, "resultIntentSender Error")
+                        Log.d(LOG_TAG, "resultIntentSender Error")
                     }
                     is Resource.Loading -> {
-                        Log.d(TAG, "resultIntentSender Loading")
+                        Log.d(LOG_TAG, "resultIntentSender Loading")
                     }
                     is Resource.Empty -> {
-                        Log.d(TAG, "resultIntentSender Empty")
+                        Log.d(LOG_TAG, "resultIntentSender Empty")
                     }
                 }
             }
+
             LoginScreen(
                 onSignInWithGoogleClick = {
                     viewModel.signInGoogle()
                 },
-                onCreateAccountClick = {},
+                onCreateAccountClick = {
+                    navController.navigate("create_account")
+                },
+                onLogInClick = { email: String, password: String ->
+                    viewModel.signInWithCredentials(email, password)
+                },
                 onTermsClick = {
                     navController.navigate("legal/terms")
                 },
@@ -105,6 +116,7 @@ fun LoveGameApp(
                 resourceUserData is Resource.Loading
             )
         }
+
         composable("profile") {
             ProfileScreen(
                 onSignOut = {
@@ -117,6 +129,7 @@ fun LoveGameApp(
                 }
             )
         }
+
         composable("legal/{legal_info}",
             arguments = listOf(
                 navArgument("legal_info"){
@@ -124,6 +137,21 @@ fun LoveGameApp(
                 }
             )) {
             Terms(it.arguments?.getString("legal_info").toString())
+        }
+
+        composable("create_account") {
+            CreateAccount(
+                onCreateAccountClick = { email: String, password: String ->
+                    viewModel.createUserWithCredentials(email, password)
+                    navController.popBackStack()
+                },
+                onTermsClick = {
+                    navController.navigate("legal/terms")
+                },
+                onPrivacyClick = {
+                    navController.navigate("legal/privacy")
+                }
+            )
         }
     }
 }

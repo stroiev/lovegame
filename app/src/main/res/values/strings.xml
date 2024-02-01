@@ -1,9 +1,12 @@
 <resources>
+
+<!--    Log In-->
     <string name="app_name">LoveGame</string>
     <string name="email">Email</string>
     <string name="log_in_text">Log in</string>
     <string name="password">Password</string>
     <string name="forgot_password_button">Forgot password?</string>
+    <string name="log_in_button">Log in</string>
     <string name="create_account_button">Create account</string>
     <string name="sign_in_with_google_button">Sign in with Google</string>
 
@@ -12,4 +15,11 @@
     <string name="privacy_policy">privacy policy</string>
     <string name="and">" and "</string>
     <string name="terms_of_use">terms of use</string>
+
+<!--    Create account-->
+    <string name="create_account_text">Create account</string>
+    <string name="retype_password">Retype password</string>
+    <string name="email_format_is_invalid">Email format is invalid</string>
+    <string name="the_entered_passwords_do_not_match">the entered passwords do not match</string>
+    <string name="the_password_must_have_between_8_and_20_characters">the password must have between 8 and 20 characters</string>
 </resources>

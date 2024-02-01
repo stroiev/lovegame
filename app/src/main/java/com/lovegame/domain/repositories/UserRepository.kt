@@ -8,5 +8,7 @@ interface UserRepository {
     suspend fun getUser(): UserData?
     suspend fun signInGoogle(): IntentSender?
     suspend fun signInWithIntent(intent: Intent): UserData?
+    suspend fun createUserWithCredentials(email: String, password: String): UserData?
+    suspend fun signInWithCredentials(email: String, password: String): UserData?
     fun signOut()
 }
