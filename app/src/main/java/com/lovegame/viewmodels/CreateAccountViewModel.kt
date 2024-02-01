@@ -1,22 +1,7 @@
 package com.lovegame.viewmodels
 
-import android.content.Intent
-import android.content.IntentSender
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.lovegame.data.Session
-import com.lovegame.domain.model.UserData
-import com.lovegame.domain.usecase.GetUserUseCase
-import com.lovegame.domain.usecase.SignInGoogleUseCase
-import com.lovegame.domain.usecase.SignInWithCredentialsUseCase
-import com.lovegame.domain.usecase.SignInWithIntentUseCase
-import com.lovegame.domain.usecase.SignOutUseCase
-import com.lovegame.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
