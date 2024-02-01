@@ -1,8 +1,10 @@
 package com.lovegame.domain.di
 
 import com.lovegame.domain.repositories.UserRepository
+import com.lovegame.domain.usecase.CreateUserWithCredentialsUseCase
 import com.lovegame.domain.usecase.GetUserUseCase
 import com.lovegame.domain.usecase.SignInGoogleUseCase
+import com.lovegame.domain.usecase.SignInWithCredentialsUseCase
 import com.lovegame.domain.usecase.SignInWithIntentUseCase
 import com.lovegame.domain.usecase.SignOutUseCase
 import dagger.Module
@@ -28,6 +30,16 @@ object UseCaseModule {
     @Provides
     fun provideSignInWithIntentUseCase(userRepository: UserRepository): SignInWithIntentUseCase {
         return SignInWithIntentUseCase(userRepository)
+    }
+    @Singleton
+    @Provides
+    fun provideCreateUserWithCredentialsUseCase(userRepository: UserRepository): CreateUserWithCredentialsUseCase {
+        return CreateUserWithCredentialsUseCase(userRepository)
+    }
+    @Singleton
+    @Provides
+    fun provideSignInWithCredentialsUseCase(userRepository: UserRepository): SignInWithCredentialsUseCase {
+        return SignInWithCredentialsUseCase(userRepository)
     }
     @Singleton
     @Provides

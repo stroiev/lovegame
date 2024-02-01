@@ -2,6 +2,7 @@ package com.lovegame.data.repositories
 
 import android.content.Intent
 import android.content.IntentSender
+import android.util.Log
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
@@ -10,6 +11,7 @@ import com.lovegame.BuildConfig
 import com.lovegame.data.mapper.UserMapper
 import com.lovegame.domain.model.UserData
 import com.lovegame.domain.repositories.UserRepository
+import com.lovegame.util.Constants.LOG_TAG
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -42,6 +44,27 @@ class UserRepositoryImpl(
             val user = auth.signInWithCredential(googleCredentials).await().user
             userMapper.responseToUserData(user)
         } catch (e: Exception) {
+            Log.d(LOG_TAG + "Rep", e.toString())
+            null
+        }
+    }
+
+    override suspend fun createUserWithCredentials(email: String, password: String): UserData? {
+        return try {
+            val user = auth.createUserWithEmailAndPassword(email,password).await().user
+            userMapper.responseToUserData(user)
+        } catch (e: Exception) {
+            Log.d(LOG_TAG + "Rep", e.toString())
+            null
+        }
+    }
+
+    override suspend fun signInWithCredentials(email: String, password: String): UserData? {
+        return try {
+            val user = auth.signInWithEmailAndPassword(email,password).await().user
+            userMapper.responseToUserData(user)
+        } catch (e: Exception) {
+            Log.d(LOG_TAG + "Rep", e.toString())
             null
         }
     }
