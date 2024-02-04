@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProgressBar(isDisplayed: Boolean) {
+fun Progress(isDisplayed: Boolean) {
     if (isDisplayed) {
         Log.d("LoveGameTag", "circular thing")
         Box(

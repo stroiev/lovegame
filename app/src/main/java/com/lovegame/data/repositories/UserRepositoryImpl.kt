@@ -1,5 +1,6 @@
 package com.lovegame.data.repositories
 
+import android.content.Context
 import android.content.Intent
 import android.content.IntentSender
 import android.util.Log
@@ -11,17 +12,25 @@ import com.lovegame.BuildConfig
 import com.lovegame.data.mapper.UserMapper
 import com.lovegame.domain.model.UserData
 import com.lovegame.domain.repositories.UserRepository
+import com.lovegame.domain.util.Resource
 import com.lovegame.util.Constants.LOG_TAG
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.cancellation.CancellationException
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.lovegame.R
 
 class UserRepositoryImpl(
     private val oneTapClient: SignInClient,
     private val userMapper: UserMapper,
     private val auth: FirebaseAuth,
+    private val context: Context
 ) : UserRepository {
 
-    override suspend fun getUser(): UserData? = userMapper.responseToUserData(auth.currentUser)
+    override suspend fun getUser(): Resource<UserData> {
+        val userData = userMapper.responseToUserData(auth.currentUser)
+        return responseToResource(userData)
+    }
 
     override suspend fun signInGoogle(): IntentSender? {
         val result = try {
@@ -49,23 +58,41 @@ class UserRepositoryImpl(
         }
     }
 
-    override suspend fun createUserWithCredentials(email: String, password: String): UserData? {
+    override suspend fun createUserWithCredentials(email: String, password: String): Resource<UserData> {
         return try {
             val user = auth.createUserWithEmailAndPassword(email,password).await().user
-            userMapper.responseToUserData(user)
+            val userData = userMapper.responseToUserData(user)
+            responseToResource(userData)
         } catch (e: Exception) {
             Log.d(LOG_TAG + "Rep", e.toString())
-            null
+            when (e) {
+                is FirebaseAuthUserCollisionException -> responseToResource(null, context.getString(
+                    R.string.user_already_exists
+                ))
+                else  -> responseToResource(null, context.getString(R.string.error_creating_acount))
+            }
+
+
+
         }
     }
 
-    override suspend fun signInWithCredentials(email: String, password: String): UserData? {
+    override suspend fun signInWithCredentials(email: String, password: String): Resource<UserData> {
         return try {
             val user = auth.signInWithEmailAndPassword(email,password).await().user
-            userMapper.responseToUserData(user)
+            val userData = userMapper.responseToUserData(user)
+            responseToResource(userData)
         } catch (e: Exception) {
             Log.d(LOG_TAG + "Rep", e.toString())
-            null
+            when (e) {
+                is FirebaseAuthInvalidCredentialsException -> responseToResource(null,
+                    context.getString(
+                        R.string.email_or_password_is_incorrect
+                    ))
+                is IllegalArgumentException -> responseToResource(null,
+                    context.getString(R.string.email_or_password_is_empty))
+                else  -> responseToResource(null, context.getString(R.string.log_in_error))
+            }
         }
     }
 
@@ -90,5 +117,12 @@ class UserRepositoryImpl(
             )
             .setAutoSelectEnabled(true)
             .build()
+    }
+
+    private fun responseToResource(response:UserData?, errmsg:String = ""): Resource<UserData> {
+        if(response != null){
+            return Resource.Success(response)
+        }
+        return Resource.Error(errmsg)
     }
 }

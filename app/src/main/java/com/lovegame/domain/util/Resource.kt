@@ -2,7 +2,7 @@ package com.lovegame.domain.util
 
 sealed class Resource<T>(
     val data: T? = null,
-    val message: String? = null
+    val message: String = ""
 ) {
     class Empty<T>(data: T? = null) : Resource<T>(data)
     class Success<T>(data: T) : Resource<T>(data)

@@ -26,6 +26,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -46,7 +50,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.lovegame.R
-import com.lovegame.compose.util.ProgressBar
+import com.lovegame.compose.util.Progress
 import com.lovegame.compose.util.Termstext
 import com.lovegame.ui.theme.LoveGameTheme
 
@@ -57,6 +61,7 @@ fun LoginScreen(
     onLogInClick: (email: String, password: String) -> Unit,
     onTermsClick: () -> Unit,
     onPrivacyClick: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     loading: Boolean
 ) {
     var email by remember { mutableStateOf("") }
@@ -64,127 +69,138 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
 
     LoveGameTheme(darkTheme = false) {
-        Box {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                colorResource(R.color.login_background_from),
-                                colorResource(R.color.login_background_to)
+        Scaffold(
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                ) {
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        snackbarData = it
+                    )
+                }
+            }
+        ) { contentPadding ->
+            Box(Modifier.padding(contentPadding)) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    colorResource(R.color.login_background_from),
+                                    colorResource(R.color.login_background_to)
+                                )
                             )
                         )
-                    )
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = "",
-                    modifier = Modifier.padding(bottom = 64.dp)
-                )
-                Text(
-                    text = stringResource(R.string.log_in_text),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                )
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
-                    label = { Text(text = stringResource(R.string.email)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.MailOutline,
-                            contentDescription = null
-                        )
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    label = { Text(text = stringResource(R.string.password)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Lock,
-                            contentDescription = null
-                        )
-                    },
-                    keyboardActions = KeyboardActions(onDone = { }),
-                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        val image = if (passwordVisible)
-                            Icons.Filled.Visibility
-                        else Icons.Filled.VisibilityOff
-                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                            Icon(imageVector = image, null)
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
-                )
-
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 64.dp)
-                )
-                {
-                    TextButton(
-                        onClick = { /*TODO Forgot password*/ },
-                    ) {
-                        Text(text = AnnotatedString(stringResource(R.string.forgot_password_button)))
-                    }
-                    Button(
-                        onClick = { onLogInClick(email, password) }) {
-                        Text(text = stringResource(R.string.log_in_button))
-                    }
-                }
-
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-//                shape = RoundedCornerShape(6.dp),
-                    onClick = { onCreateAccountClick() },
-                ) {
-                    Text(text = stringResource(R.string.create_account_button))
-                }
-
-//                Divider(thickness = 1.dp, color = MaterialTheme.colorScheme.outline)
-
-                Button(
-                    onClick = { onSignInWithGoogleClick() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 16.dp),
-//                shape = RoundedCornerShape(6.dp),
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.google),
+                        painter = painterResource(id = R.drawable.logo),
                         contentDescription = "",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .height(24.dp)
-                            .width(24.dp)
+                        modifier = Modifier.padding(bottom = 64.dp)
                     )
-                    Text(text = stringResource(R.string.sign_in_with_google_button))
+                    Text(
+                        text = stringResource(R.string.log_in_text),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.headlineLarge,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
+
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text(text = stringResource(R.string.email)) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.MailOutline,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        label = { Text(text = stringResource(R.string.password)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null
+                            )
+                        },
+                        keyboardActions = KeyboardActions(onDone = { }),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            val image = if (passwordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, null)
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 64.dp)
+                    )
+                    {
+                        TextButton(
+                            onClick = { /*TODO Forgot password*/ },
+                        ) {
+                            Text(text = AnnotatedString(stringResource(R.string.forgot_password_button)))
+                        }
+                        Button(
+                            onClick = { onLogInClick(email, password) }) {
+                            Text(text = stringResource(R.string.log_in_button))
+                        }
+                    }
+
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 16.dp),
+                        onClick = { onCreateAccountClick() },
+                    ) {
+                        Text(text = stringResource(R.string.create_account_button))
+                    }
+
+                    Button(
+                        onClick = { onSignInWithGoogleClick() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp, bottom = 16.dp),
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.google),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .height(24.dp)
+                                .width(24.dp)
+                        )
+                        Text(text = stringResource(R.string.sign_in_with_google_button))
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Termstext(
+                        onTermsClick = { onTermsClick() },
+                        onPrivacyClick = { onPrivacyClick() })
                 }
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Termstext(onTermsClick = { onTermsClick() }, onPrivacyClick = {onPrivacyClick()})
+                Progress(isDisplayed = loading)
             }
-            ProgressBar(isDisplayed = loading)
         }
     }
 }
@@ -199,6 +215,7 @@ private fun SignInScreenPreview() {
             onLogInClick = { email: String, password: String -> },
             onTermsClick = {},
             onPrivacyClick = {},
+            remember { SnackbarHostState() },
             false
         )
     }

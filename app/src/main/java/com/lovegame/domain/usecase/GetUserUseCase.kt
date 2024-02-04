@@ -8,14 +8,6 @@ import kotlinx.coroutines.flow.flow
 
 class GetUserUseCase(private val userRepository: UserRepository) {
     suspend fun execute(): Flow<Resource<UserData>> = flow {
-        emit(responseToResource(userRepository.getUser()))
-    }
-
-    private fun responseToResource(response:UserData?):Resource<UserData>{
-        if(response != null){
-                return Resource.Success(response)
-
-        }
-        return Resource.Error("user not logged in")
+        emit(userRepository.getUser())
     }
 }
