@@ -23,11 +23,13 @@ object UserRepositoryModule {
         oneTapClient: SignInClient,
         userMapper: UserMapper,
         auth: FirebaseAuth,
+        @ApplicationContext context: Context
     ): UserRepository {
         return UserRepositoryImpl(
             oneTapClient,
             userMapper,
             auth,
+            context
         )
     }
     @Singleton

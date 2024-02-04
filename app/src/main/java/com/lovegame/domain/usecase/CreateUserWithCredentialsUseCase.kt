@@ -8,13 +8,6 @@ import kotlinx.coroutines.flow.flow
 
 class CreateUserWithCredentialsUseCase(private val userRepository: UserRepository) {
     suspend fun execute(email: String, password: String): Flow<Resource<UserData>> = flow {
-        emit(responseToResource(userRepository.createUserWithCredentials(email, password)))
-    }
-    private fun responseToResource(response:UserData?):Resource<UserData>{
-        if(response != null){
-                return Resource.Success(response)
-
-        }
-        return Resource.Error("log in cancelled")
+        emit(userRepository.createUserWithCredentials(email, password))
     }
 }
