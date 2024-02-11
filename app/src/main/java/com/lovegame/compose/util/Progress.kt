@@ -9,12 +9,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.lovegame.R
 
 @Composable
 fun Progress(isDisplayed: Boolean) {
+    val TAG =  stringResource(R.string.app_name) + "Tag " + "Progress"
+
     if (isDisplayed) {
-        Log.d("LoveGameTag", "circular thing")
+        Log.d(TAG, "circular thing")
         Box(
             modifier = Modifier
                 .fillMaxSize(),

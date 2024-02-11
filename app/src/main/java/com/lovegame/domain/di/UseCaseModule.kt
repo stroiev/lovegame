@@ -3,6 +3,7 @@ package com.lovegame.domain.di
 import com.lovegame.domain.repositories.UserRepository
 import com.lovegame.domain.usecase.CreateUserWithCredentialsUseCase
 import com.lovegame.domain.usecase.GetUserUseCase
+import com.lovegame.domain.usecase.SendEmailVerificationUseCase
 import com.lovegame.domain.usecase.SignInGoogleUseCase
 import com.lovegame.domain.usecase.SignInWithCredentialsUseCase
 import com.lovegame.domain.usecase.SignInWithIntentUseCase
@@ -18,29 +19,40 @@ import javax.inject.Singleton
 object UseCaseModule {
     @Singleton
     @Provides
-    fun provideGetUserUseCase(userRepository: UserRepository):GetUserUseCase{
+    fun provideGetUserUseCase(userRepository: UserRepository): GetUserUseCase {
         return GetUserUseCase(userRepository)
     }
+
     @Singleton
     @Provides
     fun provideSignInGoogleUseCase(userRepository: UserRepository): SignInGoogleUseCase {
         return SignInGoogleUseCase(userRepository)
     }
+
     @Singleton
     @Provides
     fun provideSignInWithIntentUseCase(userRepository: UserRepository): SignInWithIntentUseCase {
         return SignInWithIntentUseCase(userRepository)
     }
+
     @Singleton
     @Provides
     fun provideCreateUserWithCredentialsUseCase(userRepository: UserRepository): CreateUserWithCredentialsUseCase {
         return CreateUserWithCredentialsUseCase(userRepository)
     }
+
+    @Singleton
+    @Provides
+    fun provideSendEmailVerificationUseCase(userRepository: UserRepository): SendEmailVerificationUseCase {
+        return SendEmailVerificationUseCase(userRepository)
+    }
+
     @Singleton
     @Provides
     fun provideSignInWithCredentialsUseCase(userRepository: UserRepository): SignInWithCredentialsUseCase {
         return SignInWithCredentialsUseCase(userRepository)
     }
+
     @Singleton
     @Provides
     fun provideSignOutUseCase(userRepository: UserRepository): SignOutUseCase {

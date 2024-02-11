@@ -1,22 +1,15 @@
-package com.lovegame.compose.login
+package com.lovegame.compose.createaccount
 
 import android.util.Log
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -36,7 +29,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -49,7 +41,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -61,47 +52,34 @@ import com.lovegame.R
 import com.lovegame.compose.util.Progress
 import com.lovegame.compose.util.SimpleDialog
 import com.lovegame.compose.util.Termstext
-import com.lovegame.compose.util.TwoButtonDialog
 import com.lovegame.domain.util.Resource
 import com.lovegame.ui.theme.LoveGameTheme
-import com.lovegame.viewmodels.LoginViewModel
+import com.lovegame.viewmodels.CreateAccountViewModel
 
 @Composable
-fun LoginScreen(
-    onCreateAccountClick: () -> Unit,
+fun CreateAccount(
     onTermsClick: () -> Unit,
     onPrivacyClick: () -> Unit,
-    gotoProfile: () -> Unit,
-    viewModel: LoginViewModel = hiltViewModel()
+    gotoLogin: () -> Unit,
+    viewModel: CreateAccountViewModel = hiltViewModel()
 ) {
-    val TAG =  stringResource(R.string.app_name) + "Tag " + "LoginScreen"
+    val TAG =  stringResource(R.string.app_name) + "Tag "+ "CreateAccount"
     var email by remember { mutableStateOf("") }
+    var emailValid by remember { mutableStateOf(true) }
     var password by remember { mutableStateOf("") }
+    var passwordValidLength by remember { mutableStateOf(true) }
+    var retypePassword by remember { mutableStateOf("") }
+    var passwordsMatch by remember { mutableStateOf(true) }
     var passwordVisible by remember { mutableStateOf(false) }
-    var openEmailVerificationSentDialog by remember { mutableStateOf(false) }
-    var openEmailNotVerifiedDialog by remember { mutableStateOf(false) }
+    var openEmailVerificationDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val resourceUserData by viewModel.resourceUserData.collectAsStateWithLifecycle()
-    val resourceIntentSender by viewModel.resourceIntentSender.collectAsStateWithLifecycle()
-
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getUser()
-    }
 
     LaunchedEffect(key1 = resourceUserData) {
         Log.d(TAG, resourceUserData.toString())
         when (resourceUserData) {
             is Resource.Success -> {
-                resourceUserData.data?.let {
-                    if (it.isVerified) {
-                        openEmailNotVerifiedDialog = false
-                        gotoProfile()
-                    } else {
-                        openEmailNotVerifiedDialog = true
-                    }
-                }
-                Log.d(TAG, "email verified: $openEmailNotVerifiedDialog")
+                openEmailVerificationDialog = true
                 viewModel.resetUserDataResource()
             }
 
@@ -111,35 +89,6 @@ fun LoginScreen(
                     snackbarHostState.showSnackbar(
                         message = resourceUserData.message
                     )
-                }
-            }
-
-            else -> {}
-        }
-    }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartIntentSenderForResult(),
-        onResult = { result ->
-            if (result.resultCode == ComponentActivity.RESULT_OK) {
-                viewModel.signInWithIntent(
-                    result.data ?: return@rememberLauncherForActivityResult
-                )
-            }
-        }
-    )
-
-    LaunchedEffect(key1 = resourceIntentSender is Resource.Success) {
-        Log.d(TAG, resourceIntentSender.toString())
-        when (resourceIntentSender) {
-            is Resource.Success -> {
-                resourceIntentSender.data?.let { intentSender ->
-                    launcher.launch(
-                        IntentSenderRequest.Builder(intentSender).build()
-                    )
-                    viewModel.resetIntentSenderResource()
-                } ?: {
-                    viewModel.signInGoogle()
                 }
             }
 
@@ -165,6 +114,7 @@ fun LoginScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
+                        .imePadding()
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
@@ -182,7 +132,7 @@ fun LoginScreen(
                         modifier = Modifier.padding(bottom = 64.dp)
                     )
                     Text(
-                        text = stringResource(R.string.log_in_text),
+                        text = stringResource(R.string.create_account_text),
                         color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.headlineLarge,
                         modifier = Modifier.padding(bottom = 16.dp),
@@ -190,7 +140,10 @@ fun LoginScreen(
 
                     OutlinedTextField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = {
+                            email = it
+                            emailValid = true
+                        },
                         label = { Text(text = stringResource(R.string.email)) },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                         leadingIcon = {
@@ -199,12 +152,24 @@ fun LoginScreen(
                                 contentDescription = null
                             )
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        supportingText = {
+                            if (!emailValid) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(R.string.email_format_is_invalid),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        }
                     )
 
                     OutlinedTextField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = {
+                            password = it
+                            passwordValidLength = true
+                        },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                         label = { Text(text = stringResource(R.string.password)) },
                         leadingIcon = {
@@ -215,6 +180,15 @@ fun LoginScreen(
                         },
                         keyboardActions = KeyboardActions(onDone = { }),
                         visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        supportingText = {
+                            if (!passwordValidLength) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(R.string.the_password_must_have_between_8_and_20_characters),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
                         trailingIcon = {
                             val image = if (passwordVisible)
                                 Icons.Filled.Visibility
@@ -225,55 +199,59 @@ fun LoginScreen(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 8.dp)
                     )
 
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 64.dp)
-                    )
-                    {
-                        TextButton(
-                            onClick = { /*TODO Forgot password*/ },
-                        ) {
-                            Text(text = AnnotatedString(stringResource(R.string.forgot_password_button)))
-                        }
-                        Button(
-                            onClick = {
-                                viewModel.signInWithCredentials(email, password)
-                            }) {
-                            Text(text = stringResource(R.string.log_in_button))
-                        }
-                    }
-
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        onClick = { onCreateAccountClick() },
-                    ) {
-                        Text(text = stringResource(R.string.create_account_button))
-                    }
-
-                    Button(
-                        onClick = {
-                            viewModel.signInGoogle()
+                    OutlinedTextField(
+                        value = retypePassword,
+                        onValueChange = {
+                            retypePassword = it
+                            passwordsMatch = true
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        label = { Text(text = stringResource(R.string.retype_password)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Lock,
+                                contentDescription = null
+                            )
+                        },
+                        keyboardActions = KeyboardActions(onDone = { }),
+                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                        supportingText = {
+                            if (!passwordsMatch) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = stringResource(R.string.the_entered_passwords_do_not_match),
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
+                        },
+                        trailingIcon = {
+                            val image = if (passwordVisible)
+                                Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff
+                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                Icon(imageVector = image, null)
+                            }
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 16.dp, bottom = 16.dp),
+                    )
+
+                    Button(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 64.dp),
+                        onClick = {
+                            emailValid = viewModel.isValidEmail(email)
+                            passwordValidLength = viewModel.isValidPasswordLenght(password)
+                            passwordsMatch = viewModel.doPasswordsMatch(password, retypePassword)
+                            if (emailValid && passwordValidLength && passwordsMatch) {
+                                viewModel.createUserWithCredentials(email, password)
+                            }
+                        },
                     ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.google),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .height(24.dp)
-                                .width(24.dp)
-                        )
-                        Text(text = stringResource(R.string.sign_in_with_google_button))
+                        Text(text = stringResource(R.string.create_account_button))
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -285,24 +263,11 @@ fun LoginScreen(
 
                 Progress(isDisplayed = resourceUserData is Resource.Loading)
 
-                if (openEmailNotVerifiedDialog) {
-                    TwoButtonDialog(
-                        text = stringResource(R.string.verification_email_sent),
-                        secondButtonText = stringResource(R.string.resend_button),
-                        onDismissRequest = {
-                            openEmailNotVerifiedDialog = false
-                        }
-                    ) {
-                        viewModel.sendEmailVerification()
-                        viewModel.signOut()
-                        openEmailVerificationSentDialog = true
-                        openEmailNotVerifiedDialog = false
-                    }
-                }
-
-                if (openEmailVerificationSentDialog) {
+                if (openEmailVerificationDialog) {
                     SimpleDialog(text = stringResource(R.string.verification_email_sent)) {
-                        openEmailVerificationSentDialog = false
+                        openEmailVerificationDialog = false
+                        viewModel.signOut()
+                        gotoLogin()
                     }
                 }
             }
@@ -310,15 +275,15 @@ fun LoginScreen(
     }
 }
 
+
 @Preview
 @Composable
-private fun SignInScreenPreview() {
+private fun CreateAccountPreview() {
     LoveGameTheme {
-        LoginScreen(
-            onCreateAccountClick = {},
+        CreateAccount(
             onTermsClick = {},
             onPrivacyClick = {},
-            gotoProfile = {}
+            gotoLogin = {}
         )
     }
 }
