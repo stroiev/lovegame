@@ -9,7 +9,8 @@ class UserMapper {
             UserData(
                 userId = uid,
                 username = displayName,
-                profilePictureUrl = photoUrl?.toString()
+                profilePictureUrl = photoUrl?.toString(),
+                isVerified = isEmailVerified
             )
         }
     }

@@ -14,16 +14,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.lovegame.R
 import com.lovegame.data.Session
+import com.lovegame.viewmodels.ProfileViewModel
 
 @Composable
 fun ProfileScreen(
-    onSignOut: () -> Unit
+    gotoLogin: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel()
 ) {
     val userData = Session.USERDATA
     Column(
@@ -31,10 +36,10 @@ fun ProfileScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if(userData?.profilePictureUrl != null) {
+        if (userData?.profilePictureUrl != null) {
             AsyncImage(
                 model = userData.profilePictureUrl,
-                contentDescription = "Profile picture",
+                contentDescription = stringResource(R.string.profile_picture),
                 modifier = Modifier
                     .size(150.dp)
                     .clip(CircleShape),
@@ -42,7 +47,7 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        if(userData?.username != null) {
+        if (userData?.username != null) {
             Text(
                 text = userData.username,
                 textAlign = TextAlign.Center,
@@ -51,8 +56,11 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        Button(onClick = onSignOut) {
-            Text(text = "Sign out")
+        Button(onClick = {
+            viewModel.signOut()
+            gotoLogin()
+        }) {
+            Text(text = stringResource(R.string.sign_out))
         }
     }
 }
