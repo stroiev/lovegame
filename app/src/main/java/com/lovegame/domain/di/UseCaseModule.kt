@@ -3,6 +3,7 @@ package com.lovegame.domain.di
 import com.lovegame.domain.repositories.UserRepository
 import com.lovegame.domain.usecase.CreateUserWithCredentialsUseCase
 import com.lovegame.domain.usecase.GetUserUseCase
+import com.lovegame.domain.usecase.ResetPasswordUseCase
 import com.lovegame.domain.usecase.SendEmailVerificationUseCase
 import com.lovegame.domain.usecase.SignInGoogleUseCase
 import com.lovegame.domain.usecase.SignInWithCredentialsUseCase
@@ -45,6 +46,12 @@ object UseCaseModule {
     @Provides
     fun provideSendEmailVerificationUseCase(userRepository: UserRepository): SendEmailVerificationUseCase {
         return SendEmailVerificationUseCase(userRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideResetPasswordUseCase(userRepository: UserRepository): ResetPasswordUseCase {
+        return ResetPasswordUseCase(userRepository)
     }
 
     @Singleton

@@ -61,6 +61,7 @@ import com.lovegame.R
 import com.lovegame.compose.util.Progress
 import com.lovegame.compose.util.SimpleDialog
 import com.lovegame.compose.util.Termstext
+import com.lovegame.compose.util.TextfieldDialog
 import com.lovegame.compose.util.TwoButtonDialog
 import com.lovegame.domain.util.Resource
 import com.lovegame.ui.theme.LoveGameTheme
@@ -80,10 +81,10 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
     var openEmailVerificationSentDialog by remember { mutableStateOf(false) }
     var openEmailNotVerifiedDialog by remember { mutableStateOf(false) }
+    var openResetPasswordDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     val resourceUserData by viewModel.resourceUserData.collectAsStateWithLifecycle()
     val resourceIntentSender by viewModel.resourceIntentSender.collectAsStateWithLifecycle()
-
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getUser()
@@ -101,7 +102,7 @@ fun LoginScreen(
                         openEmailNotVerifiedDialog = true
                     }
                 }
-                Log.d(TAG, "email verified: $openEmailNotVerifiedDialog")
+                Log.d(TAG, "email verified: ${!openEmailNotVerifiedDialog}")
                 viewModel.resetUserDataResource()
             }
 
@@ -236,7 +237,7 @@ fun LoginScreen(
                     )
                     {
                         TextButton(
-                            onClick = { /*TODO Forgot password*/ },
+                            onClick = { openResetPasswordDialog = true },
                         ) {
                             Text(text = AnnotatedString(stringResource(R.string.forgot_password_button)))
                         }
@@ -291,6 +292,7 @@ fun LoginScreen(
                         secondButtonText = stringResource(R.string.resend_button),
                         onDismissRequest = {
                             openEmailNotVerifiedDialog = false
+                            viewModel.signOut()
                         }
                     ) {
                         viewModel.sendEmailVerification()
@@ -303,6 +305,20 @@ fun LoginScreen(
                 if (openEmailVerificationSentDialog) {
                     SimpleDialog(text = stringResource(R.string.verification_email_sent)) {
                         openEmailVerificationSentDialog = false
+                    }
+                }
+
+                if (openResetPasswordDialog) {
+                    TextfieldDialog(
+                        stringResource(R.string.please_enter_your_email),
+                        stringResource(R.string.email),
+                        buttonText = stringResource(R.string.reset),
+                        onDismissRequest = {
+                            openResetPasswordDialog = false
+                        }
+                    ) {
+                        viewModel.resetPassword(it)
+                        openResetPasswordDialog = false
                     }
                 }
             }
