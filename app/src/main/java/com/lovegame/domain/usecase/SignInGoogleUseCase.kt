@@ -8,14 +8,6 @@ import kotlinx.coroutines.flow.flow
 
 class SignInGoogleUseCase(private val userRepository: UserRepository) {
     suspend fun execute(): Flow<Resource<IntentSender>> = flow {
-        emit(responseToResource(userRepository.signInGoogle()))
-    }
-
-    private fun responseToResource(response:IntentSender?):Resource<IntentSender>{
-        if(response != null){
-                return Resource.Success(response)
-
-        }
-        return Resource.Error("user not logged in")
+        emit(userRepository.signInGoogle())
     }
 }

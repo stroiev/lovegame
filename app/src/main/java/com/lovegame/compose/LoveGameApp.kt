@@ -1,5 +1,9 @@
 package com.lovegame.compose
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -15,7 +19,25 @@ import com.lovegame.compose.terms.Terms
 fun LoveGameApp() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "login") {
+    NavHost(
+        navController = navController,
+        startDestination = "login",
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Start, tween(300)
+            )
+        },
+        exitTransition = {
+            fadeOut(animationSpec = tween(300, easing = LinearEasing))
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.End, tween(300)
+            )
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(300, easing = LinearEasing))
+        }) {
         composable("login") {
 
             LoginScreen(

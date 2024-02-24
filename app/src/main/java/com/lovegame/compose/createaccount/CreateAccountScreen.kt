@@ -63,7 +63,7 @@ fun CreateAccount(
     gotoLogin: () -> Unit,
     viewModel: CreateAccountViewModel = hiltViewModel()
 ) {
-    val TAG =  stringResource(R.string.app_name) + "Tag "+ "CreateAccount"
+    val TAG = stringResource(R.string.app_name) + "Tag " + "CreateAccount"
     var email by remember { mutableStateOf("") }
     var emailValid by remember { mutableStateOf(true) }
     var password by remember { mutableStateOf("") }

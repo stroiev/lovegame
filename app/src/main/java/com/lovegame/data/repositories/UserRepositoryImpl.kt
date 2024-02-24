@@ -26,35 +26,33 @@ class UserRepositoryImpl(
     private val context: Context
 ) : UserRepository {
 
-    val TAG =  context.getString(R.string.app_name) + "Tag "+ "UserRepositoryImpl"
+    val TAG = context.getString(R.string.app_name) + "Tag " + "UserRepositoryImpl"
     override suspend fun getUser(): Resource<UserData> {
         val userData = userMapper.responseToUserData(auth.currentUser)
-        return responseToResource(userData)
+        return userData?.let { Resource.Success(it) } ?: Resource.Error("")
     }
 
-    override suspend fun signInGoogle(): IntentSender? {
-        val result = try {
-            oneTapClient.beginSignIn(
-                buildSignInRequest()
-            ).await()
+    override suspend fun signInGoogle(): Resource<IntentSender> {
+        return try {
+            val result = oneTapClient.beginSignIn(buildSignInRequest()).await()
+            Resource.Success(result.pendingIntent.intentSender)
         } catch (e: Exception) {
-            e.printStackTrace()
-            if (e is CancellationException) throw e
-            null
+            Log.d(TAG, e.toString())
+            Resource.Error(context.getString(R.string.user_not_logged_in))
         }
-        return result?.pendingIntent?.intentSender
     }
 
-    override suspend fun signInWithIntent(intent: Intent): UserData? {
+    override suspend fun signInWithIntent(intent: Intent): Resource<UserData> {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
-            userMapper.responseToUserData(user)
+            val userData = userMapper.responseToUserData(user)
+            userData?.let { Resource.Success(it) } ?: Resource.Error("")
         } catch (e: Exception) {
-            Log.d(TAG + "Rep", e.toString())
-            null
+            Log.d(TAG, e.toString())
+            Resource.Error(context.getString(R.string.log_in_cancelled))
         }
     }
 
@@ -66,17 +64,14 @@ class UserRepositoryImpl(
             val user = auth.createUserWithEmailAndPassword(email, password).await().user
             user?.sendEmailVerification()
             val userData = userMapper.responseToUserData(user)
-            responseToResource(userData)
+            userData?.let { Resource.Success(it) } ?: Resource.Error("")
         } catch (e: Exception) {
-            Log.d(TAG + "Rep", e.toString())
+            Log.d(TAG, e.toString())
             when (e) {
-                is FirebaseAuthUserCollisionException -> responseToResource(
-                    null, context.getString(
-                        R.string.user_already_exists
-                    )
-                )
+                is FirebaseAuthUserCollisionException ->
+                    Resource.Error(context.getString(R.string.user_already_exists))
 
-                else -> responseToResource(null, context.getString(R.string.error_creating_acount))
+                else -> Resource.Error(context.getString(R.string.error_creating_acount))
             }
         }
     }
@@ -85,9 +80,19 @@ class UserRepositoryImpl(
         val user = auth.currentUser
         try {
             user?.sendEmailVerification()
-            Log.d(TAG + "Rep", "Email verification sent")
+            Log.d(TAG, "Email verification sent")
         } catch (e: Exception) {
-            Log.d(TAG + "Rep", e.toString())
+            Log.d(TAG, e.toString())
+        }
+    }
+
+    override suspend fun resetPassword(email: String): Resource<UserData> {
+        return try {
+            auth.sendPasswordResetEmail(email).await()
+            Resource.Empty()
+        } catch (e: Exception) {
+            Log.d(TAG, e.toString())
+            Resource.Error(context.getString(R.string.faild_to_send_reset_password))
         }
     }
 
@@ -98,23 +103,17 @@ class UserRepositoryImpl(
         return try {
             val user = auth.signInWithEmailAndPassword(email, password).await().user
             val userData = userMapper.responseToUserData(user)
-            responseToResource(userData)
+            userData?.let { Resource.Success(it) } ?: Resource.Error("")
         } catch (e: Exception) {
-            Log.d(TAG + "Rep", e.toString())
+            Log.d(TAG, e.toString())
             when (e) {
-                is FirebaseAuthInvalidCredentialsException -> responseToResource(
-                    null,
-                    context.getString(
-                        R.string.email_or_password_is_incorrect
-                    )
-                )
+                is FirebaseAuthInvalidCredentialsException ->
+                    Resource.Error(context.getString(R.string.email_or_password_is_incorrect))
 
-                is IllegalArgumentException -> responseToResource(
-                    null,
-                    context.getString(R.string.email_or_password_is_empty)
-                )
+                is IllegalArgumentException ->
+                    Resource.Error(context.getString(R.string.email_or_password_is_empty))
 
-                else -> responseToResource(null, context.getString(R.string.log_in_error))
+                else -> Resource.Error(context.getString(R.string.log_in_error))
             }
         }
     }
@@ -142,10 +141,4 @@ class UserRepositoryImpl(
             .build()
     }
 
-    private fun responseToResource(response: UserData?, errmsg: String = ""): Resource<UserData> {
-        if (response != null) {
-            return Resource.Success(response)
-        }
-        return Resource.Error(errmsg)
-    }
 }

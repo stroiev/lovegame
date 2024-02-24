@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.lovegame.data.Session
 import com.lovegame.domain.model.UserData
 import com.lovegame.domain.usecase.GetUserUseCase
+import com.lovegame.domain.usecase.ResetPasswordUseCase
 import com.lovegame.domain.usecase.SendEmailVerificationUseCase
 import com.lovegame.domain.usecase.SignInGoogleUseCase
 import com.lovegame.domain.usecase.SignInWithCredentialsUseCase
@@ -27,7 +28,8 @@ class LoginViewModel @Inject constructor(
     private val signInWithIntentUseCase: SignInWithIntentUseCase,
     private val signInWithCredentialsUseCase: SignInWithCredentialsUseCase,
     private val signOutUseCase: SignOutUseCase,
-    private val sendEmailVerificationUseCase: SendEmailVerificationUseCase
+    private val sendEmailVerificationUseCase: SendEmailVerificationUseCase,
+    private val resetPasswordUseCase: ResetPasswordUseCase
 ) : ViewModel() {
 
     private val _resourceUserData = MutableStateFlow<Resource<UserData>>(Resource.Empty())
@@ -73,6 +75,13 @@ class LoginViewModel @Inject constructor(
 
     fun sendEmailVerification() {
         sendEmailVerificationUseCase.execute()
+    }
+
+    fun resetPassword(email: String) = viewModelScope.launch {
+        _resourceUserData.value = Resource.Loading()
+        resetPasswordUseCase.execute(email).collect {
+            _resourceUserData.value = it
+        }
     }
 
     fun signOut() = signOutUseCase.execute()
