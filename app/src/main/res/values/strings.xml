@@ -1,6 +1,9 @@
 <resources>
+    <!--    Dialogs-->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 
-<!--    Log In-->
+    <!--    Log In-->
     <string name="app_name">LoveGame</string>
     <string name="email">Email</string>
     <string name="log_in_text">Log in</string>
@@ -13,13 +16,13 @@
     <string name="please_enter_your_email">Please enter your email</string>
     <string name="reset">Reset</string>
 
-<!--    Agree terms and condtitions text-->
+    <!--    Agree terms and condtitions text-->
     <string name="by_joining_you_agree_to_the">"By joining, you agree to the "</string>
     <string name="privacy_policy">privacy policy</string>
     <string name="and">" and "</string>
     <string name="terms_of_use">terms of use</string>
 
-<!--    Create account-->
+    <!--    Create account-->
     <string name="create_account_text">Create account</string>
     <string name="retype_password">Retype password</string>
     <string name="email_format_is_invalid">Email format is invalid</string>
@@ -27,7 +30,7 @@
     <string name="the_password_must_have_between_8_and_20_characters">the password must have between 8 and 20 characters</string>
     <string name="verification_email_sent">Verification email has been sent, please verify your email</string>
 
-<!--    User Repository-->
+    <!--    User Repository-->
     <string name="user_already_exists">User already exists</string>
     <string name="error_creating_acount">Error creating acount</string>
     <string name="email_or_password_is_incorrect">Email or password is incorrect</string>
@@ -37,14 +40,17 @@
     <string name="user_not_logged_in">user not logged in</string>
     <string name="faild_to_send_reset_password">Faild to send reset password</string>
 
-<!--    Profile Screen-->
+    <!--    Profile Screen-->
     <string name="profile_picture">Profile picture</string>
     <string name="sign_out">Sign out</string>
     <string name="resend">Resend</string>
     <string name="please_verify_your_email">Please verify your email</string>
 
-<!--    Dialogs-->
-    <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <!--    PhotoSelectorView-->
+    <string name="camera_permission_denied">Permission Denied</string>
+    <string name="failed_to_create_image">Failed to create image</string>
+    <string name="you_can_t_select_more_than_pictures">You can\'t select more than %1$d pictures</string>
+    <string name="select_photos">Select Photos</string>
+    <string name="capture_image">Capture Image</string>
 
 </resources>
